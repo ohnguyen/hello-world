@@ -1,0 +1,53 @@
+---
+title: "Project 2 Draft"
+output: html_notebook
+---
+Is it possible for truffle fermentation systems to mimic the aroma/volatiles of the actual Tuber melanosporum flirting body? 
+
+Given that dimethyl sulfide is one of the most identifying VOCs of Tuber melanosporum, if there is a comparable composition of Dimethyl sulfide in the fermentation broth or mycelia, then the aroma/volatiles should be very similar to that of the actual fruiting body of Tuber melanosporum. 
+
+```{r}
+#use function read.csv to read in the csv files and assign them 
+broth <- read.csv("broth.csv", row.names = 1)
+
+fruitbody <- read.csv("fruitbody.csv", row.names = 1)
+
+#check the matrixes made in the last lines 
+head(broth)
+head(fruitbody)
+
+#use function subset to remove extra column from counts dataframe so it matches the 
+fruitbody_fixed <- subset(fruitbody, select = -c(MS))
+
+#check new counts dataframe 
+head(fruitbody_fixed)
+
+fruitbody_cleaned <- fruitbody_fixed[rowSums(fruitbody_fixed)]
+
+#check counts_cleaned dataframe 
+head(fruitbody_cleaned)
+```
+```
+
+```{r}
+#Load in the BiocManager package and the DESeq2 under that to be able to use function DESeqDataSetFromMatrix to turn our matrices into DESeqDataSet object. Install DESeq package. 
+library(BiocManager)
+BiocManager::install("DESeq2")
+library(DESeq2)
+
+#make DESeqDataSet from the matrixes above, using fruitbody_cleaned as the count data and the broth as the column data. 
+DESeqDataSet <- DESeqDataSetFromMatrix (countData = fruitbody_cleaned, colData = broth, design = ~condition)
+
+# use DESeq function to analyse the object 
+DESeqDataSet <- DESeq(DESeqDataSet)
+
+#print out object to check code
+DESeqDataSet
+
+# assign the results of the deseq function to results variable 
+results <- results(DESeqDataSet)
+
+#call summary of the results we got from the analysis using function "summary"
+summary(results)
+```
+
